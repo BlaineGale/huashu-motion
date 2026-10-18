@@ -256,6 +256,8 @@ huashu-motion/
 | 📕 小红书 | [花叔](https://www.xiaohongshu.com/user/profile/5abc6f17e8ac2b109179dfdf) |
 | 💬 公众号 | 微信搜「花叔」 |
 
+<img src="https://raw.githubusercontent.com/alchaincyf/alchaincyf/main/assets/follow.svg" alt="关注花叔：公众号花叔、B站花叔v、小红书花叔三个二维码" width="100%" />
+
 ## 许可证
 
 代码和文档：MIT。随便用，随便改，随便造。

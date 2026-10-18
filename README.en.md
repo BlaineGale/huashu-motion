@@ -171,6 +171,8 @@ Exception: the "bean Huashu" character (drawn in `runtime/clip/lib/toon.js`, and
 | ▶️ YouTube | [@Alchain](https://www.youtube.com/@Alchain) |
 | 📺 Bilibili | [花叔v](https://space.bilibili.com/14097567) |
 
+<img src="https://raw.githubusercontent.com/alchaincyf/alchaincyf/main/assets/follow.svg" alt="Follow Huashu: WeChat official account, Bilibili and Xiaohongshu QR codes" width="100%" />
+
 ---
 
 <div align="center">
