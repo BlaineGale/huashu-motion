@@ -1,7 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { findChrome } from '../cli/lib/browser.js';
-import { CdpError, launch, newPage } from '../cli/lib/cdp.js';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { CdpError, LOCAL_STATE, launch, newPage } from '../cli/lib/cdp.js';
 
 const skip = !findChrome() && 'no Chrome';
 
@@ -28,6 +30,20 @@ for (const transport of ['pipe', 'websocket']) {
     await assert.rejects(() => conn.send('Browser.getVersion'), /gone|closed|exited/);
   });
 }
+
+// Without this cache Chrome on Windows signs in with an empty password on every fresh profile and can lock the account.
+test('cdp: every profile starts with the blank-password answer cached, so Chrome never signs in to check', async () => {
+  const conn = await launch('/no/such/chrome', { transport: 'pipe' });
+  try {
+    const state = JSON.parse(readFileSync(join(conn.profile, 'Local State'), 'utf8'));
+    assert.deepEqual(state, LOCAL_STATE);
+    // Chrome rechecks unless the cached last-changed time is at least now (microseconds since 1601), as a string
+    const nowUs = (BigInt(Date.now()) + 11_644_473_600_000n) * 1000n;
+    assert.equal(state.password_manager.os_password_blank, false);
+    assert.ok(BigInt(state.password_manager.os_password_last_changed) > nowUs * 100n);
+    assert.ok(BigInt(state.password_manager.os_password_last_changed) < 2n ** 63n);
+  } finally { await conn.close(); }
+});
 
 test('cdp: a browser that cannot start is reported, not hung', async () => {
   await assert.rejects(() => launch('/no/such/chrome', { transport: 'pipe' }).then((c) => c.send('Browser.getVersion')), /Chrome|ENOENT|gone/);

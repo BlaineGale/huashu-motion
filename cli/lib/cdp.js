@@ -5,7 +5,7 @@
 // Written against the public protocol documentation (chromedevtools.github.io/devtools-protocol).
 import { spawn } from 'node:child_process';
 import { rm } from 'node:fs/promises';
-import { mkdtempSync, readFileSync, rmSync, existsSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, existsSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -22,6 +22,13 @@ export const CHROME_FLAGS = [
   '--enable-unsafe-swiftshader', '--disable-breakpad', '--disable-component-update', '--disable-sync', '--metrics-recording-only', '--no-pings',
 ];
 
+// Written into every fresh profile before Chrome starts. On Windows, Chrome 153+ checks ~40 s after starting on a
+// profile without this cache whether the account has a blank password, by signing in as the user with an empty one
+// (password_manager_util_win CheckBlankPasswordWithPrefs → LogonUser). Each check is a failed sign-in (event 4625):
+// one per render worker per render, enough to lock the account (Windows 11: 10 failures in 10 minutes).
+// A last-changed time far in the future means the cached answer is always current, so Chrome never asks.
+export const LOCAL_STATE = { password_manager: { os_password_blank: false, os_password_last_changed: '9000000000000000000' } };
+
 // Ctrl-C or a kill does not run 'exit' handlers: what must not be left behind (browsers, temp profiles, a render's
 // scratch folder) registers here and is cleaned up on SIGINT / SIGTERM before the process exits.
 const leftovers = new Set();
@@ -37,6 +44,7 @@ export function cleanupOnInterrupt(fn) {
 //   conn.on('Runtime.exceptionThrown', (params, sessionId) => …)
 export async function launch(exe, { transport = 'pipe', args = [], timeout = 30_000 } = {}) {
   const profile = mkdtempSync(join(tmpdir(), 'om-chrome-'));
+  writeFileSync(join(profile, 'Local State'), JSON.stringify(LOCAL_STATE));
   // Chrome refuses to run as root with its sandbox (containers, CI); nothing else about the render changes
   const root = process.platform === 'linux' && process.getuid?.() === 0 ? ['--no-sandbox'] : [];
   const flags = [...CHROME_FLAGS, ...root, `--user-data-dir=${profile}`, ...args, 'about:blank'];
