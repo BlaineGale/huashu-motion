@@ -60,3 +60,11 @@ test('om still: a page that registers window.__timelines itself (as the template
   const bright = (f, x) => Number(spawnSync('ffmpeg', ['-v', 'error', '-i', f, '-vf', `crop=40:40:${x}:0,scale=1:1,format=gray`, '-f', 'rawvideo', '-'], { encoding: 'buffer' }).stdout[0]);
   assert.ok(bright(join(dir, 'p-2.00s.png'), 600) > 200, 'at 2 s the square has moved right (the timeline was found and sought)');
 });
+
+test('om swatch: palettes taken from the product keep the brand — no house-look warnings for an orange brand', async () => {
+  const { parsePalettes, checkPalettes } = await import('../cli/lib/swatch.js');
+  const card = (k, g, a) => `${k} · x\nPalette:  ground ${g} 70 · ink #1A1D21 · accent ${a} 5 — from: site CSS and logo\n`;
+  const notes = checkPalettes(parsePalettes(card('A', '#FAF9F6', '#C2410C') + card('B', '#FFFFFF', '#C2410C') + card('C', '#F6F4EE', '#E8590C')));
+  assert.ok(notes.some((n) => /comes from the product/.test(n)));
+  assert.ok(!notes.some((n) => /^warning/.test(n)), notes.join('\n'));
+});

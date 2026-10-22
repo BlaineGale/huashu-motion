@@ -52,16 +52,20 @@ export function checkPalettes(palettes) {
     if (!p.from) parts.push('no source ("— from: …"): say where the colours came from');
     notes.push(`${p.name.padEnd(24)} ${parts.join(' · ')}`);
   }
-  if (palettes.length >= 2) {
+  // A palette taken from the product (its site, CSS, logo, interface, materials.md) is the brand's, not a house look:
+  // an orange brand stays orange. The cross-direction warnings below are only for palettes the agent invented.
+  const owned = (p) => /\b(site|css|brand|logo|product|interface|ui|app|screenshot|materials?|icon|官网|品牌|界面|截图|素材)\b/i.test(p.from || '');
+  if (palettes.length >= 2 && palettes.every(owned)) notes.push('· every palette comes from the product — kept as the brand; no house-look warnings (colour.md §3)');
+  else if (palettes.length >= 2) {
     const grounds = palettes.map((p) => role(p, 'ground') || p.swatches[0]);
     const dark = grounds.filter((g) => hsl(g.hex).l < 0.2).length, light = grounds.filter((g) => hsl(g.hex).l > 0.8).length;
     if (dark === palettes.length) notes.push(`warning  every direction has a dark ground — at least one should not (colour.md §3)`);
     if (light === palettes.length) notes.push(`warning  every direction has a light ground — let one differ in value`);
     // the loudest colour of each palette, whatever its role is called (accent, flood, glow…)
     const accents = palettes.map((p) => [...p.swatches].sort((a, b) => hsl(b.hex).s * (1 - Math.abs(2 * hsl(b.hex).l - 1)) - hsl(a.hex).s * (1 - Math.abs(2 * hsl(a.hex).l - 1)))[0]);
-    if (accents.every((a) => warm(a.hex))) notes.push('warning  every accent is a warm orange-red — the house look; change the hue family of at least one (colour.md §2)');
+    if (accents.every((a) => warm(a.hex))) notes.push('warning  every accent is a warm orange-red — the house look, unless it is the colour of the product itself (then say so in "— from:"); otherwise change the hue family of at least one (colour.md §2)');
     const single = palettes.filter((p) => p.swatches.filter((s) => /accent/i.test(s.role)).length === 1 && p.swatches.length <= 4).length;
-    if (single === palettes.length) notes.push('warning  all directions are "neutral ground + one accent" — vary the strategy too (colour.md §3)');
+    if (single === palettes.length) notes.push('warning  all directions are "neutral ground + one accent" — fine when that is the brand (say so in "— from:"); otherwise vary the strategy (colour.md §3)');
   }
   return notes;
 }

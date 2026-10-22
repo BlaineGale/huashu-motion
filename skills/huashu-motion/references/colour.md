@@ -61,25 +61,30 @@ What separates a designed palette from a generated one:
 - **The accent is scarce so that it means something.** If it is on every element, it marks nothing;
   if it floods the screen, that is an event placed on a beat.
 
-## 3. Three directions differ in colour strategy
+## 3. The product's colours first; directions differ in how they use them
 
-Across the three direction cards, vary the ground's value (at least one light ground and at least
-one that is not), the hue family, and the strategy itself:
+A film about a product is in the product's colours: the ones its site, interface, logo and packaging
+really use (`om grab` lists them in materials.md, with where each came from). An orange brand stays
+orange, a neutral interface with one accent stays that. The three directions differ in language,
+structure and material, and in how they use the brand's palette:
 
-- **Product colour.** The product's finish or interface sets everything (hardware, a strong brand).
-- **Neutral world, one signal.** A quiet ground and one accent with one meaning.
-- **Colour fields.** Full-screen saturated grounds that switch on the cut; fits the montage route.
+- **Product colour.** The interface or finish sets everything (most software, hardware, a strong brand).
+- **Neutral world, one signal.** The brand's ground and its one accent, with one meaning.
 - **Natural light.** Real footage carries the colour, and the graphics stay neutral.
 - **Material.** Paper, metal, clay or glass, photographed or sampled and lit.
+- **Colour fields.** Full-screen saturated grounds that switch on the cut. Only when the colours are
+  the product's own (its skins, themes, a palette tool) — never invented to add energy; energy comes
+  from motion and cutting.
 
-Three variants of "neutral ground plus one accent" are one direction three times. `om swatch
-directions.md` puts the three palettes side by side and warns when every ground is dark (or every one
-light), every accent is a warm orange-red, or every direction is neutral plus one accent.
+Invent colours only when the product has none of its own to give (a concept, an idea, a brand-new
+product without a site), and say so on the card. Then vary the ground's value and hue family across
+the directions. `om swatch directions.md` skips its house-look warnings when every palette names a
+product source in "— from:", and warns when invented palettes all share one look.
 
 ## 4. The house look, as patterns
 
-These combinations make a film interchangeable with what every other agent produces. Avoid them
-unless the brand's own values really are one of them, and then say so on the card:
+These combinations make a film interchangeable with what every other agent produces. Avoid them in
+invented palettes; when the brand's own values are one of them, use them and say so on the card:
 
 - dark ground, one warm accent (terracotta, amber, vermilion, orange), bone or cream type, often a
   serif display;

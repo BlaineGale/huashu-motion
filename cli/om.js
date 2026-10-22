@@ -14,6 +14,7 @@ const VERSION = JSON.parse(readFileSync(join(PKG, 'package.json'), 'utf8')).vers
 
 const HELP = `huashu-motion ${VERSION} — motion graphics made by your coding agent, edited by pointing at the frame.
 
+  om grab <url|folder> [dir]   the product's real material into <dir>/materials/: page screenshots, logo, images, its colours and type (a URL), or the project's own screenshots, icons, media and stylesheet colours (a folder)
   om new <dir> [--template t]   start a project (om templates lists them)
   om templates                  starter projects and what each is good for
   om demo [dir]                 copy the showcase film and open it in the studio
@@ -329,6 +330,13 @@ async function main() {
       return out(await voice(openProject(pos[0] || '.'), flags, (l) => process.stderr.write(l + '\n')));
     }
 
+    case 'grab': {
+      if (!pos[0]) throw new OmError('usage: om grab <url|folder> [dir]   (dir: the film project, default .)');
+      const { grab } = await import('./lib/grab.js');
+      const root = resolve(pos[1] || '.');
+      mkdirSync(root, { recursive: true });
+      return out(await grab(root, pos[0], { maxShots: flags.shots ? Number(flags.shots) : 8 }));
+    }
     case 'share': {
       const { share } = await import('./lib/share.js');
       return out(share(openProject(pos[0] || '.'), { from: flags.from ?? 0, to: flags.to ?? null, video: flags.video ? resolve(flags.video) : null }));

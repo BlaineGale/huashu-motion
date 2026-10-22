@@ -46,3 +46,18 @@ test('check (source): Array.from with an arrow that returns layout, and a file n
   writeFileSync(join(project.root, 'assets', '100%.png'), '');
   assert.deepEqual(codes(checkSource(project), 'error'), []);
 });
+
+test('om check --source: a film that draws the product instead of showing it is warned about', async () => {
+  const { checkSource } = await import('../cli/lib/check.js');
+  const { mkdtempSync, writeFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const film = (body) => { const root = mkdtempSync(join(tmpdir(), 'om-real-')); writeFileSync(join(root, 'index.html'), `<!doctype html><html><head><meta charset="utf-8"></head><body><div data-composition-id="f" data-width="320" data-height="180">${body}</div><script>window.__timelines={f:{seek(){},pause(){},duration(){return 2}}}</script></body></html>`); return { root, index: join(root, 'index.html'), om: join(root, '.om') }; };
+  const codes = (body) => checkSource(film(body)).map((f) => f.code);
+  assert.ok(codes('<div class="ui"></div>').includes('no-real-material'));
+  assert.ok(codes('<img src="assets/icon128.png">').includes('only-logo'));
+  assert.ok(codes('<img src="https://placehold.co/600x400"><img src="assets/shot.png">').includes('placeholder'));
+  const real = codes('<img src="materials/web-site/screen-01.png">');
+  assert.ok(!real.includes('no-real-material') && !real.includes('only-logo'));
+  assert.ok(real.includes('no-materials-list'));
+});

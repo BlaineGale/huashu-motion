@@ -17,7 +17,9 @@ screenshots, logo, brand colours, existing launch posts, the data file. Note in 
 - **The one thing** this film must leave behind (see §2). If the user did not say it, propose it.
 - **Personality** on five sliders (§3), with the evidence you read it from (the site's type, its
   copy, its colours). Brand assets beat adjectives: use the real logo, colours and type.
-- **Real material**: UI you can rebuild or screenshot, numbers with sources, footage, a voice.
+- **Real material**, collected before anything is drawn (`om grab <folder>` for the project on this
+  machine, `om grab <url>` for the site and repo; run the product and capture it): the logo file,
+  the interface, numbers with sources, footage, a voice.
   Real material is the strongest thing in a film; a faithful rebuild of the product's own UI beats
   any invented mock-up. Every string, number and default you put on screen must point to a real
   screenshot, recording or page; what you cannot point to is not shown. Footage the user gives (a
@@ -134,8 +136,8 @@ Sound:           <music character, BPM, the 2–3 hits that matter>
 Risk:            <what could make it fail, e.g. "needs real UI screenshots">
 ```
 
-Find the colours before drawing anything and vary the colour strategy across the three
-([colour.md](colour.md)); `om swatch directions.md` renders the three palettes side by side and
+Take the colours from the product before drawing anything; the three use the brand's palette
+differently rather than inventing new ones ([colour.md](colour.md)); `om swatch directions.md` renders the three palettes side by side and
 warns when they share the house look. Show that PNG with the key frames.
 
 Let the user pick (or mix). Users mix by layer — "c's composition and people, b's feeling", or one
@@ -202,8 +204,11 @@ the account. Defaults, not laws: break one when the direction calls for it and s
    a signature move to use on purpose, not a requirement. A film at the same
    energy from start to end is boring however good each frame is; `om sound` prints the energy of
    every stretch and flags a flat one. Narrated or ambient films follow the voice instead.
-4. **Real product.** The product's actual UI and words, rebuilt crisply with a cursor doing real
-   clicks, or a clean recording of the real thing. Never a screenshot panned around. Prompts and code
+4. **Real product.** The product's actual UI and words: a clean capture or recording of the real
+   thing, or — when it has to move — a code rebuild traced over a capture with a cursor doing real
+   clicks. Never grey placeholder boxes, never a UI invented because it was quicker, and never a
+   placeholder where a photo, avatar or thumbnail belongs: use the product's own, a real one found
+   online, or an openly licensed one, with its source in materials.md. Never a screenshot panned around. Prompts and code
    shown on screen count as real material.
 5. **Craft shows at rest.** Every hold is a poster: type set properly, one accent, no default fonts.
 6. **Sound.** Long films and films with people are sound-led; short UI films and loops must read
