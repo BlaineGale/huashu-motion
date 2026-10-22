@@ -29,7 +29,7 @@ used, with evidence.
 | [editorial-collage](languages/editorial-collage.md) | It's real; look at this line | news, commentary, case studies | `vox-collage` |
 | [hand-drawn](languages/hand-drawn.md) | Human, thinking aloud | teaching, friendly brands, annotations | `whiteboard` |
 | [character](languages/character.md) | Emotion, personality | stories, consumer, agents as actors | `storytime` |
-| [3d-object](languages/3d-object.md) | Tangible, premium | hardware, logos, maps → cities | `blank` + Three.js |
+| [3d-object](languages/3d-object.md) | Tangible, premium | hardware, logos, devices, maps → cities, the interface in space | `object-3d` (Three.js) · `ui-space` (CSS 3D) |
 | [generative-field](languages/generative-field.md) | Intelligence, mood | model launches, music, loops | `blank` |
 | [liquid-glass](languages/liquid-glass.md) | Premium consumer | iOS apps, photo/media | `blank` |
 | [photo-led](languages/photo-led.md) | The real world | travel, food, fashion, ads | `blank` |

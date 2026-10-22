@@ -161,6 +161,8 @@ const LAYOUT = (t) => `(() => {
   const seen = new Set();
   for (let n; (n = walker.nextNode());) {
     const el = n.parentElement;
+    // whitespace between tags is not text: it would judge the parent (or body) by all its children's text, hidden ones included
+    if (!n.nodeValue.trim()) continue;
     // single letters are kinetic type (split, stacked, flown in): judged as a word, not one by one
     if (!el || seen.has(el) || el.textContent.trim().length < 3 || /^(SCRIPT|STYLE|NOSCRIPT|TITLE)$/.test(el.tagName)) continue;
     seen.add(el);

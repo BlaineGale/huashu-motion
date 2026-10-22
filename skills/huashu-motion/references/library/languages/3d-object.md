@@ -33,9 +33,11 @@ Deep whooshes for camera travel, mechanical clicks for assembly, airy pads.
 
 ## Build
 
-Three.js via `OM.clock(tl, t => render(t))`; geometry procedural or GLB; lights and materials set
-deliberately (white metal looks black without an environment). Regions for clickable objects via
-`OM.region` with projected boxes.
+Start from `om new <dir> --template object-3d`: a lit studio (`OM3.stage`, `OM3.lights`, `OM3.cyc`), the
+product's real screenshot on a device (`OM3.screen`), its icon or logo SVG extruded (`OM3.logo`), panels cut from
+the same capture for depth, one camera (`OM.space`) and one clock (`OM3.film`). GLB models with `OM3.gltf`.
+Camera moves, the space, materials and the pitfalls: [depth.md](../../depth.md). For an interface rather than an
+object, the same camera over CSS 3D layers: `--template ui-space`.
 
 ## Breaks when
 

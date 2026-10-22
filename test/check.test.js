@@ -61,3 +61,10 @@ test('om check --source: a film that draws the product instead of showing it is 
   assert.ok(!real.includes('no-real-material') && !real.includes('only-logo'));
   assert.ok(real.includes('no-materials-list'));
 });
+
+test('check (page): whitespace between tags does not judge a parent by its hidden children', { skip: !findChrome() && 'no Chrome' }, async () => {
+  // a title block whose lines are hidden (they fade in later) and would run off the frame: nothing to warn about yet
+  const { project } = makeFilm({ sound: false, video: false, body: '<div id="end">\n  <h1 style="position:absolute;left:200px;top:120px;margin:0;font-size:30px;white-space:nowrap;opacity:0">a long closing title</h1>\n  <p style="position:absolute;left:200px;top:150px;margin:0;opacity:0">and a subtitle</p>\n</div>' });
+  const found = await checkPage(project, { samples: 4 });
+  assert.deepEqual(found.filter((f) => /^text-|low-contrast/.test(f.code)), [], JSON.stringify(found));
+});

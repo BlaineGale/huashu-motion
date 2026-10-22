@@ -53,6 +53,15 @@ One paused timeline at `window.__timelines[<composition-id>]`. Without `data-dur
 
 - `OM.clock(tl, t => draw(t), duration)` — drive a frame-by-frame canvas/WebGL engine from the timeline.
 - `OM.region(id, box(t), label)` — pickable canvas regions.
+- `OM.space('#world' | threeCamera, { fov })` — a camera in 3D ([depth.md](depth.md)). `cam.set(pose)`, `cam.to(tl, at, { ...pose, duration, ease })`; a pose is `target: [x,y,z] | '#el'`, `distance`, `yaw` / `pitch` / `roll` (degrees), `fov`, or `fit: '#el'` with `pad`, or `flat: true` (a page's resting pose: z = 0 lands exactly on the layout), `position: [x,y,z]`, `dolly` (× distance). Moves run on arcs round the target; the pose is a pure function of time (`cam.pose(t)`, `cam.apply(t)`). A page world is an absolutely placed element whose layers sit at `translate3d`/`rotate` (page px, y down); its parent gets the perspective. `cam.attach(threeCamera)` poses a Three camera over the same page coordinates. `cam.locate('#el')` gives an element's centre in world coordinates.
+- `vendor/three.min.js` (Three.js r186 + RoomEnvironment, GLTF/SVG/HDR loaders, RoundedBox, EffectComposer with Bokeh/Bloom/Output passes, Reflector, as `window.THREE`) and `vendor/om-three.js` (`window.OM3`), copied by the `object-3d` template:
+  - `OM3.stage(canvas, { background, env: 'studio'|'room'|'x.hdr', exposure, fov, dof: { aperture, maxblur }, bloom, fog, units: 'px' })` → `{ renderer, scene, camera, render, add }`
+  - `OM3.lights(stage, { span })`, `OM3.cyc(stage, { color, y, depth, radius })` — key + rim with soft shadows; a studio sweep.
+  - `OM3.logo(svg | 'x.svg', { size, depth, bevel, color, metalness, roughness })` — the real SVG extruded, its own colours.
+  - `OM3.screen(img, { width, aspect, bezel, depth, radius, body, glass, crop: [l, t, r, b] })` — a capture on a device or a card (bezel 0), unlit so it keeps its colours.
+  - `OM3.gltf('x.glb')`, `OM3.texture(url)`, `OM3.read(url, type)` — loads that work from `file://` and are waited for.
+  - `OM3.film(stage, tl, duration, cam, update)` — one clock: poses the camera, calls `update(t)`, renders once after the seek, focused on the camera's target.
+  - `OM3.region(id, object, stage, label)` — the object's projected box, pickable in the studio. `OM3.ready(promise)` — wait for (and redraw after) anything else.
 - `OM.cue('word', nth?, 'start'|'end')` — when a narration word is spoken (from `om voice`); motion anchored to words follows a new recording automatically.
 - `OM.vars()` — the variables.
 - `OM.sfx(name, at, opts)` — a sound effect at `at` (returns `at`); `OM.music({ product, drop, ending, marks, bpm })` — a built-in direction, or `<script type="text/vnd.abc" id="om-score">` — your own score, its `!mark:name!`s landing on `scene:name`; `OM.beat(n)` — n beats in seconds. `om sound` synthesizes them into `assets/sound.wav` + `<audio id="om-sound">` ([sound.md](sound.md)).

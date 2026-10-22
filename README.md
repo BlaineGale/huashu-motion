@@ -334,7 +334,7 @@ skill最大的一块是导演方法：先读产品、找出它的气质，再选
 | 命令 | 做什么 |
 |---|---|
 | `om grab` | 把产品的真实素材收进项目：网页截图、logo、配图、品牌色和字体，或本地工程里的截图、图标、录屏 |
-| `om new` · `om templates` | 新建项目，可以从10个模板起步 |
+| `om new` · `om templates` | 新建项目，可以从12个模板起步 |
 | `om studio` | 编辑器：实时预览、场景条、直接改值、在画面上留评论 |
 | `om inbox --wait` · `om look` · `om done` | agent那一侧：接下一条评论、看你点的位置、回报改了什么 |
 | `om sound` · `om voice` · `om samples` | 配乐和音效、口播、真乐器采样包 |
@@ -349,7 +349,7 @@ skill最大的一块是导演方法：先读产品、找出它的气质，再选
 | | 数量 |
 |---|---|
 | 运动语言（每种写清楚它在说什么、适合什么、怎么做） | 20种，`skills/huashu-motion/references/library/` |
-| 起步模板（发布会、财经图表、动态文字、白板、Vox拼贴、3Blue1Brown、Kurzgesagt、口播包装……） | 10个，`templates/` |
+| 起步模板（发布会、财经图表、动态文字、白板、Vox拼贴、3Blue1Brown、Kurzgesagt、口播包装、界面3D空间、Three.js影棚物体……） | 12个，`templates/` |
 | 音效 | 23种 |
 | 兜底配乐方向 | 12类产品 × 3种 |
 | 示范谱 | 3份，`skills/huashu-motion/references/scores/` |
@@ -362,7 +362,7 @@ huashu-motion/
 ├── cli/                    # om命令行：新建、编辑器、收件箱、配乐、口播、检查、渲染、导出
 ├── runtime/                # 片子里用的OM.*小工具，和逐帧渲染的引擎
 ├── studio/                 # 浏览器里的编辑器
-├── templates/              # 10个起步模板
+├── templates/              # 12个起步模板
 ├── fonts/                  # 随附的开源字体
 ├── examples/               # 样片（om demo打开的那支）
 └── test/                   # 测试

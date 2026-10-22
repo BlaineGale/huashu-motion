@@ -281,7 +281,7 @@ After the export, `om share` makes a share kit: a GIF under 10 MB (the opening p
 | Command | What it does |
 |---|---|
 | `om grab` | The product's real material into the project: page screenshots, logo, images, its colours and type, or the screenshots, icons and recordings in its own project folder |
-| `om new` · `om templates` | Start a project, from one of 10 templates |
+| `om new` · `om templates` | Start a project, from one of 12 templates |
 | `om studio` | Live preview, scene strip, direct edits, frame comments |
 | `om inbox --wait` · `om look` · `om done` | Agent side: take the next comment, see the spot, report back |
 | `om sound` · `om voice` · `om samples` | Music and effects, narration, the instrument pack |
@@ -294,7 +294,7 @@ After the export, `om share` makes a share kit: a GIF under 10 MB (the opening p
 | | |
 |---|---|
 | Motion languages, each with what it says, what it suits and how to build it | 20, `skills/huashu-motion/references/library/` |
-| Starter templates (keynote, finance chart, kinetic type, whiteboard, Vox collage, 3Blue1Brown, Kurzgesagt, talking-head package, …) | 10, `templates/` |
+| Starter templates (keynote, finance chart, kinetic type, whiteboard, Vox collage, 3Blue1Brown, Kurzgesagt, talking-head package, interface in 3D space, objects in a Three.js studio, …) | 12, `templates/` |
 | Sound effects | 23 |
 | Fallback music directions | 12 product types × 3 |
 | Annotated example scores | 3, `skills/huashu-motion/references/scores/` |

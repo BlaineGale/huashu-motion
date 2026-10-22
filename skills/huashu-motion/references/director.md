@@ -210,6 +210,10 @@ the account. Defaults, not laws: break one when the direction calls for it and s
    placeholder where a photo, avatar or thumbnail belongs: use the product's own, a real one found
    online, or an openly licensed one, with its source in materials.md. Never a screenshot panned around. Prompts and code
    shown on screen count as real material.
+   **In depth when it can be.** The same real material reads as made, not slid, when the camera
+   moves round it: the interface as layers in space that separate and settle, the logo and the
+   screens as objects in a lit studio, something near, the subject, something behind. A film that is
+   flat from start to end needs a reason (a changelog, a typographic ident). [depth.md](depth.md)
 5. **Craft shows at rest.** Every hold is a poster: type set properly, one accent, no default fonts.
 6. **Sound.** Long films and films with people are sound-led; short UI films and loops must read
    with the sound off (a silent, self-explaining loop was among the most saved films). Each landing

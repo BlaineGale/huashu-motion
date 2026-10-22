@@ -202,4 +202,168 @@
     apply();
     return cam;
   };
+
+  // A camera in 3D. The same poses drive a page (a "world" of DOM layers in CSS 3D: real screenshots,
+  // interfaces rebuilt in code, text that stays sharp and pickable) or a Three.js camera.
+  // A pose is a point the camera looks at, how far it stands from it and from which side:
+  //   target [x, y, z] | '#el', distance, yaw (degrees, + = from the right), pitch (+ = from above),
+  //   roll, fov (degrees). fit: '#el' frames an element with `pad` around it. flat: true is the
+  //   resting pose of a page — everything at z = 0 lands exactly where the layout put it.
+  // Moves interpolate the angles and the distance, so the camera travels on arcs around what it
+  // looks at (an orbit, a crane, a swing round) instead of cutting straight through it, and the pose
+  // is a pure function of time: any frame can be rendered alone.
+  //   Page:  const cam = OM.space('#world', { fov: 35 });   // #world: position absolute, children placed
+  //          cam.set({ target: '#app', distance: 2600, yaw: -38, pitch: 22 });   with translate3d/rotate
+  //          cam.to(tl, 0.4, { fit: '#app', pad: 80, yaw: -12, pitch: 8, duration: 1.4, ease: 'expo.out' });
+  //          cam.to(tl, 3.2, { flat: true, duration: 1, ease: 'power3.inOut' });
+  //   Three: const cam = OM.space(camera, { target: [0, 0, 0], distance: 8 });
+  //          OM.clock(tl, (t) => { cam.apply(t); renderer.render(scene, camera); }, D);
+  //   Both:  cam.attach(camera) also poses a Three camera over the page (page px, y flipped), so a
+  //          WebGL layer behind the world moves with it.
+  // A page world needs its layers in front of the camera (CSS draws nothing sensible behind it), and
+  // preserve-3d on every element between the world and a layer: overflow, filter, opacity < 1 or
+  // mix-blend on that path flatten it.
+  OM.space = function (subject, opts) {
+    const o = opts || {};
+    const rad = Math.PI / 180;
+    const three = subject && subject.isPerspectiveCamera ? subject : null;
+    const root = document.querySelector('[data-composition-id]');
+    const W = o.width || Number(root?.getAttribute('data-width')) || 1920;
+    const H = o.height || Number(root?.getAttribute('data-height')) || 1080;
+    let world = null;
+    if (!three) {
+      world = typeof subject === 'string' ? document.querySelector(subject) : subject;
+      if (!world) throw new Error(`huashu-motion: OM.space — no element ${subject}`);
+      if (getComputedStyle(world).position === 'static') world.style.position = 'absolute';
+      Object.assign(world.style, { left: '0px', top: '0px', width: W + 'px', height: H + 'px', transformOrigin: '0 0 0', transformStyle: 'preserve-3d' });
+      world.parentElement.style.perspectiveOrigin = `${W / 2}px ${H / 2}px`;
+    }
+    const attached = [];
+    const ydown = !three; // page coordinates grow downwards
+    const flatDist = (fov) => H / 2 / Math.tan((fov * rad) / 2);
+    const fov0 = o.fov || (three ? three.fov : 35);
+    let home = three
+      ? { x: 0, y: 0, z: 0, dist: 10, yaw: 0, pitch: 0, roll: 0, fov: fov0 }
+      : { x: W / 2, y: H / 2, z: 0, dist: flatDist(fov0), yaw: 0, pitch: 0, roll: 0, fov: fov0 };
+    // Where an element sits in the world: its layout box carried through the transforms of the
+    // positioned elements between it and the world (put transforms on positioned elements).
+    const locate = (sel) => {
+      const el = typeof sel === 'string' ? (world || document).querySelector(sel) || document.querySelector(sel) : sel;
+      if (!el) throw new Error(`huashu-motion: OM.space — no element ${sel}`);
+      let m = new DOMMatrix(), n = el;
+      while (n && n !== world) {
+        const cs = getComputedStyle(n);
+        let local = new DOMMatrix().translate(n.offsetLeft || 0, n.offsetTop || 0);
+        if (cs.transform && cs.transform !== 'none') {
+          const [ox, oy, oz] = cs.transformOrigin.split(' ').map(parseFloat);
+          local = local.translate(ox, oy, oz || 0).multiply(new DOMMatrix(cs.transform)).translate(-ox, -oy, -(oz || 0));
+        }
+        m = local.multiply(m);
+        n = n.offsetParent;
+      }
+      const c = m.transformPoint(new DOMPoint(el.offsetWidth / 2, el.offsetHeight / 2, 0));
+      return { x: c.x, y: c.y, z: c.z, w: el.offsetWidth, h: el.offsetHeight };
+    };
+    let plan = { ...home };
+    const pose = (p) => {
+      const out = { ...plan };
+      if (p.fov != null) out.fov = p.fov;
+      if (p.flat) Object.assign(out, { x: W / 2, y: H / 2, z: 0, dist: flatDist(out.fov), yaw: 0, pitch: 0, roll: 0 });
+      const tgt = p.fit || p.target;
+      if (tgt != null) {
+        if (Array.isArray(tgt)) [out.x, out.y, out.z] = [tgt[0], tgt[1], tgt[2] || 0];
+        else {
+          const b = locate(tgt), pad = p.pad == null ? 80 : p.pad;
+          Object.assign(out, { x: b.x, y: b.y, z: b.z });
+          if (p.fit) out.dist = Math.max(b.h + 2 * pad, ((b.w + 2 * pad) * H) / W) / 2 / Math.tan((out.fov * rad) / 2);
+        }
+      }
+      if (p.position) {
+        const d = [p.position[0] - out.x, p.position[1] - out.y, p.position[2] - out.z];
+        out.dist = Math.hypot(...d) || out.dist;
+        out.pitch = Math.asin((ydown ? -d[1] : d[1]) / out.dist) / rad;
+        out.yaw = Math.atan2(d[0], d[2]) / rad;
+      }
+      for (const k of ['yaw', 'pitch', 'roll']) if (p[k] != null) out[k] = p[k];
+      if (p.distance != null) out.dist = p.distance;
+      if (p.dolly != null) out.dist *= p.dolly;
+      return out;
+    };
+    const moves = [];
+    const easeOf = (e) => (window.gsap && gsap.parseEase(e || 'power3.inOut')) || ((x) => x);
+    const mix = (a, b, u) => {
+      const r = {};
+      for (const k of Object.keys(a)) r[k] = k === 'dist' ? Math.exp(Math.log(a[k]) + (Math.log(b[k]) - Math.log(a[k])) * u) : a[k] + (b[k] - a[k]) * u;
+      return r;
+    };
+    const state = (t) => {
+      let s = home;
+      for (const m of moves) if (t >= m.at) s = t >= m.at + m.dur ? m.to : mix(m.from, m.to, m.ease((t - m.at) / m.dur));
+      return s;
+    };
+    // Camera position and its right / up / forward vectors, in the subject's own coordinates.
+    const frame = (s) => {
+      const pitch = Math.max(-89, Math.min(89, s.pitch)) * rad, yaw = s.yaw * rad, sy = ydown ? -1 : 1;
+      const T = [s.x, s.y, s.z];
+      const C = [T[0] + s.dist * Math.sin(yaw) * Math.cos(pitch), T[1] + sy * s.dist * Math.sin(pitch), T[2] + s.dist * Math.cos(yaw) * Math.cos(pitch)];
+      const norm = (v) => { const l = Math.hypot(...v) || 1; return v.map((x) => x / l); };
+      const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+      const f = norm([T[0] - C[0], T[1] - C[1], T[2] - C[2]]), up = [0, sy, 0];
+      let r = ydown ? norm(cross(up, f)) : norm(cross(f, up));
+      let u = ydown ? cross(f, r) : cross(r, f);
+      const cr = Math.cos(s.roll * rad), sr = Math.sin(s.roll * rad);
+      [r, u] = [r.map((x, i) => x * cr + u[i] * sr), u.map((x, i) => x * cr - r[i] * sr)];
+      return { C, T, r, u, f };
+    };
+    const toThree = (cam, s, flip) => {
+      const { C, r, u, f } = frame(s);
+      const y = (v) => (flip ? [v[0], -v[1], v[2]] : v);
+      const [c, rr, uu, ff] = [y(C), y(r), y(u), y(f)];
+      cam.position.set(c[0], c[1], c[2]);
+      const m = new cam.matrix.constructor().makeBasis({ x: rr[0], y: rr[1], z: rr[2] }, { x: uu[0], y: uu[1], z: uu[2] }, { x: -ff[0], y: -ff[1], z: -ff[2] });
+      cam.quaternion.setFromRotationMatrix(m);
+      if (cam.fov !== s.fov || cam.aspect !== W / H) { cam.fov = s.fov; cam.aspect = W / H; cam.updateProjectionMatrix(); }
+      cam.updateMatrixWorld(true);
+    };
+    const apply = (t) => {
+      const s = state(t);
+      if (three) toThree(three, s, false);
+      if (world) {
+        const { C, r, u, f } = frame(s), d = flatDist(s.fov);
+        const R = [r, u.map((x) => -x), f.map((x) => -x)];
+        const tr = R.map((row, i) => [W / 2, H / 2, d][i] - (row[0] * C[0] + row[1] * C[1] + row[2] * C[2]));
+        world.style.transform = `matrix3d(${[R[0][0], R[1][0], R[2][0], 0, R[0][1], R[1][1], R[2][1], 0, R[0][2], R[1][2], R[2][2], 0, tr[0], tr[1], tr[2], 1].map((x) => +x.toFixed(6)).join(',')})`;
+        world.parentElement.style.perspective = d.toFixed(3) + 'px';
+        for (const a of attached) toThree(a, { ...s }, true);
+      }
+      return s;
+    };
+    // A page world is moved by one clock tween over all the moves (rebuilt as moves are added).
+    let drive = null;
+    const proxy = {};
+    Object.defineProperty(proxy, 't', { get: () => 0, set: (v) => apply(v) });
+    const cam = {
+      set(p) { home = pose(p || {}); plan = { ...home }; apply(0); return cam; },
+      to(tl, at, p) {
+        const q = p || {}, to = pose(q), dur = q.duration == null ? 1 : Math.max(1e-6, q.duration);
+        moves.push({ at: Math.max(0, at), dur, ease: easeOf(q.ease), from: { ...plan }, to });
+        moves.sort((a, b) => a.at - b.at);
+        plan = to;
+        if (world && tl) {
+          if (drive) drive.kill();
+          const end = cam.end();
+          drive = tl.fromTo(proxy, { t: 0 }, { t: end, duration: end, ease: 'none', immediateRender: false }, 0);
+        }
+        return cam;
+      },
+      // the pose at time t, and the subject (and attached cameras) put there
+      pose: (t) => { const s = state(t), { C, T } = frame(s); return { position: C, target: T, distance: s.dist, yaw: s.yaw, pitch: s.pitch, roll: s.roll, fov: s.fov }; },
+      apply,
+      attach(c) { attached.push(c); apply(0); return cam; },
+      end: () => moves.reduce((m, x) => Math.max(m, x.at + x.dur), 0),
+      locate,
+    };
+    apply(0);
+    return cam;
+  };
 })();

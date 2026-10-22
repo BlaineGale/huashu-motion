@@ -157,11 +157,13 @@ whole hold.
 
 **Parallax.** Says: *depth*. Layers move at different rates (foreground 1.3×, background 0.6×).
 
-**3D orbit / dolly.** Says: *it's a real object*. Three.js camera on an arc around the product.
+**3D orbit / dolly.** Says: *it's a real object*. A camera on an arc around the product: `OM.space` moves interpolate yaw, pitch and distance, so orbits, cranes and swings come out as arcs ([depth.md](../depth.md)).
+
+**Interface in space.** Says: *this is built, there is more behind it*. The real interface cut into layers that stand apart in z, the camera swinging round them, then the layers collapsing into the flat screen (`flat: true`). Template `ui-space`.
 
 **Card wall / carousel.** Says: *scale — there are many of these*. A wall of sites, videos or icons in
 perspective, flying past or turning as a carousel; the camera then pushes into one card. Lay the
-cards on a 3D plane (CSS `perspective` + `rotateY`) and move the camera, not the cards.
+cards on a 3D plane (`translate3d`/`rotateY` inside an `OM.space` world) and move the camera, not the cards.
 
 **Camera shake / impact.** Says: *weight, a slam*. 2–6 px decaying over 0.2 s on the impact frame
 (`OM.random(seed)` for the offsets). Once or twice a film.
