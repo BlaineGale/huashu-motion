@@ -8,9 +8,14 @@ example score and kept its header. Every film sounded alike. `om sound` now prin
 
 ## Choose the world before the notes
 
-1. **Each direction card carries its music**: a world from the list below, its tempo, its band, one reference
-   people know. The three directions have three different worlds — choosing a direction chooses the music too.
-2. **Match the world to the product and the picture**, not to "launch": a terminal tool can be pulse
+1. **You choose, the user doesn't.** Music is not on the direction cards: most people can't pick a music
+   world from a name. Once a direction is chosen, choose the world here and write it into the treatment
+   (world · tempo · band · one reference). Offer options only when the user asks; a style or track they name wins.
+2. **Variety comes from the product, not from a dice roll.** Read what is particular about this product — who
+   uses it, where, at what pace, what it feels like to use, where it comes from — and let that pick the world,
+   the tempo and the band. Two products are rarely the same in all of that, so their films rarely sound alike.
+   The tempo is the product's and the cut's, not a default 120. Match the world to the product and the
+   picture, not to "launch": a terminal tool can be pulse
    minimalism or minimal techno; a consumer app UK garage or folk; a model release cinematic or Reich; a
    notes app lo-fi; a game chiptune. The personality sliders (director §3) point the way: calm ↔ energetic,
    human ↔ technical, playful ↔ premium, local ↔ global.
@@ -401,5 +406,6 @@ V:PN inst=piano gain=0.6
 | retro, nostalgic | synthwave · chiptune · funk | — |
 | Chinese culture, heritage | 国风 electronic · lyrical waltz with dizi/guzheng | — |
 
-Three directions → three rows apart, or one row's three different worlds. Never three variations of one
-world, and never the world of the last film unless the user asked for it.
+Most products sit in two rows at once (a developer tool for calm, private work; an AI product for families):
+the world that fits both is usually the right one, and it is rarely the obvious first pick of either row. Never
+the world of the last film unless the user asked for it.

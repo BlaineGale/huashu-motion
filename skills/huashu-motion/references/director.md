@@ -138,11 +138,10 @@ Palette:         <role #hex share · …> — from: <where each colour came from
 Logline:         <the film in one sentence, with the hook and the ending>
 Why it fits:     <message shape + personality sentence → this>
 Feel:            <route (continuous / montage / hybrid), BPM, events per bar, what the first 3 s show with the sound off>
-Music:           <a world from music.md> · <BPM> · <band: 3–5 instruments + kit> · <a reference people know>; the 2–3 hits that matter
 Risk:            <what could make it fail, e.g. "needs real UI screenshots">
 ```
 
-The three Music lines name three different worlds ([music.md](music.md)): the user is choosing what the film sounds like as much as how it looks, and "launch cue, 120 BPM" three times is no choice.
+Music is not on the cards. Most users can't judge a music world from a name, and asking them to is a decision they don't want: once a direction is chosen, you choose the music from the product's character ([music.md](music.md)) and write it into the treatment. Offer music options only when the user asks for a say in it; when they name a style or a track, use theirs.
 
 Take the colours from the product before drawing anything; the three use the brand's palette
 differently rather than inventing new ones ([colour.md](colour.md)); `om swatch directions.md` renders the three palettes side by side and
