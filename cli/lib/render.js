@@ -24,7 +24,7 @@ export function nextOutput(project, ext) {
 // with alpha (WebM VP9 alpha also works); a composition that declares a boolean variable
 // `transparent` gets it set to true for this render (hide the footage, clear the background); the
 // sound is dropped because the edit underneath already has it; and the result is checked for alpha.
-export async function render(project, { format, fps, out, transparent = false, blur = 1, engine, video = 'extract', workers, frameFormat, tune = {}, allowPageErrors = false, prepare = null, onLog = () => {}, onWarn = () => {} } = {}) {
+export async function render(project, { format, fps, out, transparent = false, blur = 1, engine, video = 'extract', workers, frameFormat, tune = {}, allowPageErrors = false, prepare = null, onLog = () => {}, onNote = onLog, onWarn = () => {} } = {}) {
   if (engine && engine !== 'om') throw new OmError(engine === 'hyperframes' ? 'the HyperFrames renderer was removed — om render uses its own engine now (drop --engine)' : '--engine must be om');
   const { html } = readSource(project);
   format = format || (transparent ? 'mov' : 'mp4');
@@ -45,7 +45,7 @@ export async function render(project, { format, fps, out, transparent = false, b
   const target = out || nextOutput(project, format);
   let r;
   try {
-    r = await renderOm(project, { fps, out: target, format, transparent, blur, video, variables: switchVar ? { transparent: true } : null, ...(workers ? { workers } : {}), ...(frameFormat ? { frameFormat } : {}), ...tune, allowPageErrors, prepare, verify: transparent ? (file) => checkOverlay(file, switchVar, onWarn) : null, onLog, onWarn });
+    r = await renderOm(project, { fps, out: target, format, transparent, blur, video, variables: switchVar ? { transparent: true } : null, ...(workers ? { workers } : {}), ...(frameFormat ? { frameFormat } : {}), ...tune, allowPageErrors, prepare, verify: transparent ? (file) => checkOverlay(file, switchVar, onWarn) : null, onLog, onNote, onWarn });
   } catch (e) {
     // the version we claimed stays free for the next try (only the empty placeholder is removed, never a film)
     if (claimed && existsSync(target) && statSync(target).size === 0) unlinkSync(target);

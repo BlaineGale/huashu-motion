@@ -38,6 +38,13 @@ tl.addLabel('scene:intro', 0).addLabel('scene:chart', 3.2);
 
 The studio draws them as the scene strip, and comments carry the scene they were made in.
 
+## The signature
+
+Every film of 4 s or more ends with a small "Made with huashu-motion" for its last 1.2 s: the engine draws it in the film's own typeface and text colour, in the first corner of the end frame that holds no text or picture, everywhere the film plays (studio, stills, render, share page). Overlay renders (`--transparent`) and shorter films never get it.
+
+- `data-om-signature="off"` on `<html>` or the root removes it; `"top-left"` (or another corner) pins it.
+- Leave one corner of the end frame clear. `om check` warns (`signature-covers`) when no corner is free.
+
 ## Timing
 
 One paused timeline at `window.__timelines[<composition-id>]`. Without `data-duration` on the root, the film is as long as the timeline, so hold variables can change the length — end with the closing hold, e.g. `tl.to({}, { duration: V.endHold })`. Keep every position ≥ 0 (a negative position shifts the whole timeline), and remember `fromTo` renders its start state immediately (`immediateRender: false` or `set` at the moment when something must not exist earlier).

@@ -42,7 +42,7 @@ export async function openFilm(file, { chrome = findChrome(), transport = 'pipe'
     await Promise.all([page.send('Page.enable'), page.send('Runtime.enable'), page.send('Log.enable')]);
     await page.send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
     if (transparent) await page.send('Emulation.setDefaultBackgroundColorOverride', { color: { r: 0, g: 0, b: 0, a: 0 } });
-    const boot = `window.__omConfig=${JSON.stringify({ video, lenient, paintWaits })};window.__omVariables=${JSON.stringify(variables || {}).replace(/</g, '\\u003c')};\n` + readFileSync(ENGINE, 'utf8');
+    const boot = `window.__omConfig=${JSON.stringify({ video, lenient, paintWaits, transparent })};window.__omVariables=${JSON.stringify(variables || {}).replace(/</g, '\\u003c')};\n` + readFileSync(ENGINE, 'utf8');
     await page.send('Page.addScriptToEvaluateOnNewDocument', { source: boot });
     const loaded = new Promise((ok) => page.on('Page.loadEventFired', ok));
     const nav = await page.send('Page.navigate', { url: pathToFileURL(target).href });

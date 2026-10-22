@@ -57,7 +57,7 @@ const CONTAINERS = {
 };
 export const FORMATS = Object.keys(CONTAINERS);
 
-export async function renderOm(project, { fps, out, format = 'mp4', transparent = false, blur = 1, video = 'extract', frameFormat = 'png', workers = defaultWorkers(), shotFormat = null, paintWaits = 0, chunk = 8, preset = 'veryfast', crf = 16, software = false, onFrame = null, variables = null, allowPageErrors = false, prepare = null, verify = null, onLog = () => {}, onWarn = () => {} }) {
+export async function renderOm(project, { fps, out, format = 'mp4', transparent = false, blur = 1, video = 'extract', frameFormat = 'png', workers = defaultWorkers(), shotFormat = null, paintWaits = 0, chunk = 8, preset = 'veryfast', crf = 16, software = false, onFrame = null, variables = null, allowPageErrors = false, prepare = null, verify = null, onLog = () => {}, onNote = onLog, onWarn = () => {} }) {
   if (!['extract', 'seek'].includes(video)) throw new OmError('--video must be extract or seek');
   if (!['jpg', 'png'].includes(frameFormat)) throw new OmError('--frames must be jpg or png');
   const box = CONTAINERS[format];
@@ -87,6 +87,8 @@ export async function renderOm(project, { fps, out, format = 'mp4', transparent 
     }
   }
   const film = films[0];
+  const sig = await film.evaluate('window.__omEngine.signature()').catch(() => null);
+  if (sig) onNote(sig.on ? `signature on: "Made with huashu-motion" in a free corner for the last 1.2s (data-om-signature="off" on the root removes it)` : `signature off (${sig.why})`);
   const tmp = mkdtempSync(join(tmpdir(), 'om-render-'));
   const forgetTmp = cleanupOnInterrupt(() => rmSync(tmp, { recursive: true, force: true }));
   const picture = join(tmp, format === 'gif' ? 'picture.mp4' : `picture.${format}`);

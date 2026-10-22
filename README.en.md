@@ -112,6 +112,8 @@ Requirements:
 
 Before a film it reads your past preferences and what earlier films taught; after it, it keeps what is worth keeping. Your preferences stay on your machine.
 
+After the export, `om share` makes a share kit: a GIF under 10 MB (the opening plus the end frame — ready for a README header or a post) and a share.md with the post and the README snippet. Films of 4 s or more end with a small "Made with huashu-motion" for their last 1.2 s, in a free corner, in the film's own typeface and colour; ask your agent to switch it off if you'd rather not.
+
 ## How it works
 
 - **A film is one `index.html`.** GSAP, Canvas, Three.js, SVG, anything a browser draws. No video model; every frame is a function of the code and the time.
@@ -127,7 +129,7 @@ Before a film it reads your past preferences and what earlier films taught; afte
 | `om inbox --wait` · `om look` · `om done` | Agent side: take the next comment, see the spot, report back |
 | `om sound` · `om voice` · `om samples` | Music and effects, narration, the instrument pack |
 | `om check` · `om qa` · `om still` | Before and after rendering |
-| `om render` · `om export html` · `om fork` | Export, share page, new frame size |
+| `om render` · `om share` · `om export html` · `om fork` | Export, share kit (GIF + post), share page, new frame size |
 | `om learn` · `om undo` · `om doctor` | Experience, undo, environment check |
 
 ## What's inside

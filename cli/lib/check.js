@@ -246,6 +246,9 @@ export async function checkPage(project, { samples = 24, fps = 30, onLog = () =>
       }
     }
     for (const [img, at, what] of [[firstShot, 0, 'first'], [lastShot, last, 'last']]) if (img && flat(img)) add('warning', 'blank-frame', `the ${what} frame is a single flat colour — start moving / end on the brand`, at);
+    // the signature: the film is now at its last frame, where the engine has chosen a corner for it
+    const sig = await film.evaluate('window.__omEngine.signature ? window.__omEngine.signature() : null');
+    if (sig && sig.shown && !sig.shown.clear) add('warning', 'signature-covers', `the "Made with huashu-motion" signature finds no free corner in the last 1.2s and sits ${sig.shown.corner} over the film — leave one corner of the end frame clear, pin it with data-om-signature="top-left" (or another corner) on the root, or switch it off with data-om-signature="off"`, last);
     onLog(`sampled  ${list.length} frames`);
 
     // the same frame reached two ways: after everything above, and straight away in a fresh page

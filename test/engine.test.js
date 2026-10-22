@@ -85,3 +85,39 @@ test('engine: elements added later are bound too (data-var-src, data-var-text)',
     assert.equal(await film.evaluate('document.getElementById("late").textContent'), 'T2');
   } finally { await film.close(); }
 });
+
+// the signature: what a viewer sees in the last 1.2 s of a film, and every way it stays out
+const sigAt = async (film, t) => { await film.seek(t); return film.evaluate(`(() => { const s = document.getElementById('om-signature'), i = window.__omEngine.signature();
+  return { on: i.on, why: i.why || null, corner: i.shown && i.shown.corner, clear: i.shown && i.shown.clear, display: s ? s.style.display : null, opacity: s ? Number(s.style.opacity) : 0, text: s ? s.textContent : '' }; })()`); };
+
+test('engine: a film of 4 s or more ends with "Made with huashu-motion" in a free corner, faded in over its last 1.2 s', { skip }, async () => {
+  const { index } = makeFilm({ video: false, sound: false, duration: 6 });
+  const film = await openFilm(index, {});
+  try {
+    assert.equal((await sigAt(film, 3)).display, null, 'nothing before its window');
+    const early = await sigAt(film, 4.85), end = await sigAt(film, 5.99);
+    assert.equal(end.text, 'Made with huashu-motion');
+    assert.ok(early.opacity > 0 && early.opacity < end.opacity, `fades in: ${early.opacity} then ${end.opacity}`);
+    assert.ok(Math.abs(end.opacity - 0.78) < 0.01);
+    assert.equal(end.corner, 'bottom-right');
+    assert.equal(end.clear, true);
+    assert.equal((await sigAt(film, 3)).display, 'none', 'seeking back hides it again (a pure function of time)');
+  } finally { await film.close(); }
+});
+
+test('engine: the signature moves to a corner the film leaves free, and data-om-signature pins or removes it', { skip }, async () => {
+  const body = '<div style="position:absolute;right:4px;bottom:4px;font-size:14px">www.example.com</div>';
+  let film = await openFilm(makeFilm({ video: false, sound: false, duration: 6, body }).index, {});
+  try { const s = await sigAt(film, 5.9); assert.equal(s.corner, 'bottom-left'); assert.equal(s.clear, true); } finally { await film.close(); }
+  film = await openFilm(makeFilm({ video: false, sound: false, duration: 6, script: 'document.getElementById("film").setAttribute("data-om-signature", "top-left");' }).index, {});
+  try { assert.equal((await sigAt(film, 5.9)).corner, 'top-left'); } finally { await film.close(); }
+  film = await openFilm(makeFilm({ video: false, sound: false, duration: 6, script: 'document.documentElement.setAttribute("data-om-signature", "off");' }).index, {});
+  try { const s = await sigAt(film, 5.9); assert.equal(s.on, false); assert.equal(s.display, null); } finally { await film.close(); }
+});
+
+test('engine: no signature on an overlay render or a film shorter than 4 s', { skip }, async () => {
+  let film = await openFilm(makeFilm({ video: false, sound: false, duration: 6, clear: true }).index, { transparent: true });
+  try { const s = await sigAt(film, 5.9); assert.equal(s.on, false); assert.equal(s.why, 'overlay render'); } finally { await film.close(); }
+  film = await openFilm(makeFilm({ video: false, sound: false, duration: 2 }).index, {});
+  try { const s = await sigAt(film, 1.95); assert.equal(s.on, false); assert.equal(s.display, null); } finally { await film.close(); }
+});

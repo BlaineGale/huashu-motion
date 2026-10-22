@@ -128,6 +128,8 @@ skill里的`bin/om`会直接调用仓库里的命令行工具，改仓库就是�
 
 开工前，它会先读你以前的偏好和过去片子留下的经验；每支片子做完，再把你这次说过的话、在编辑器里提的评论收一遍，值得留下的记下来。你的偏好只存在你自己电脑上。
 
+导出以后，`om share`会出一个分享包：一张10MB以内的GIF（开头加片尾，可以直接当README头图、发X），和一份写好发帖文案、README头图代码的share.md。4秒以上的片子，最后1.2秒会在片尾空着的角落出现一行小字「Made with huashu-motion」，用这支片自己的字体和颜色；不想要，跟agent说一声就关掉。
+
 ---
 
 ## 怎么做到的
@@ -180,7 +182,7 @@ skill最大的一块是导演方法：先读产品、找出它的气质，再选
 | `om inbox --wait` · `om look` · `om done` | agent那一侧：接下一条评论、看你点的位置、回报改了什么 |
 | `om sound` · `om voice` · `om samples` | 配乐和音效、口播、真乐器采样包 |
 | `om check` · `om qa` · `om still` | 渲染前检查、成片检查、任意时刻截一帧 |
-| `om render` · `om export html` · `om fork` | 导出、分享页、换画幅 |
+| `om render` · `om share` · `om export html` · `om fork` | 导出、分享包（GIF＋发帖文案）、分享页、换画幅 |
 | `om learn` · `om undo` · `om doctor` | 经验、撤回、环境检查 |
 
 ---

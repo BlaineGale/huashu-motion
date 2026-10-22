@@ -172,6 +172,132 @@
     }
   }
 
+  // ---------- signature ----------
+  // "Made with huashu-motion" in a corner for the last SIG_SHOW seconds, so a film that travels says where it came from.
+  // It is part of the picture everywhere the engine runs (render, still, check, studio, share page), drawn in the film's
+  // own typeface and text colour, in the first corner where it covers no text or picture. A pure function of t and the
+  // page at t, like everything else. Off with data-om-signature="off" on <html> or the root; a corner name pins it
+  // (bottom-right, bottom-left, top-right, top-left). Never on an overlay render or a film shorter than SIG_MIN seconds.
+  const SIG_SHOW = 1.2, SIG_FADE = 0.3, SIG_MIN = 4, SIG_ALPHA = 0.78;
+  const CORNERS = ['bottom-right', 'bottom-left', 'top-right', 'top-left'];
+  let sig = null, sigCorner = null;
+  function signatureSetting() {
+    const r = root();
+    const v = ((r && r.getAttribute('data-om-signature')) || document.documentElement.getAttribute('data-om-signature') || 'auto').trim().toLowerCase();
+    if (cfg.transparent) return { on: false, why: 'overlay render' };
+    if (/^(off|none|false|no|0)$/.test(v)) return { on: false, why: 'data-om-signature="off"' };
+    if (!r) return { on: false, why: 'not a composition' };
+    const d = duration();
+    if (d < SIG_MIN) return { on: false, why: `shorter than ${SIG_MIN}s` };
+    return { on: true, corner: CORNERS.includes(v) ? v : 'auto', from: d - SIG_SHOW };
+  }
+  const rgba = (s) => { const m = /rgba?\(([^)]+)\)/.exec(s || ''); if (!m) return null; const p = m[1].split(/[\s,/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
+  const lum = (c) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+  const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  const seen = (el) => { let o = 1; for (let e = el; e && e.nodeType === 1; e = e.parentElement) { const s = getComputedStyle(e); if (s.display === 'none' || s.visibility === 'hidden') return 0; o *= Number(s.opacity); } return o; };
+  // What the film shows in the frame, as boxes: visible text, and pictures smaller than most of the frame (a logo, a phone).
+  function contentBoxes(W, H) {
+    const boxes = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n; (n = walker.nextNode());) {
+      const el = n.parentElement;
+      if (!el || sig.contains(el) || !n.textContent.trim() || /^(SCRIPT|STYLE|NOSCRIPT|TITLE)$/.test(el.tagName) || seen(el) < 0.05) continue;
+      // SVG text has no client rects through a Range: its element's box stands in (the badge or label it belongs to)
+      if (el.namespaceURI === 'http://www.w3.org/2000/svg') { const g = el.closest('g') || el, r = g.getBoundingClientRect(); boxes.push(r.width * r.height < 0.6 * W * H ? r : el.getBoundingClientRect()); continue; }
+      const range = document.createRange(); range.selectNodeContents(n);
+      for (const r of range.getClientRects()) if (r.width > 1 && r.height > 1) boxes.push(r);
+    }
+    for (const el of document.querySelectorAll('img,svg,video,canvas')) {
+      if (sig.contains(el) || (el.tagName.toLowerCase() === 'svg' && el.parentElement && el.parentElement.closest('svg'))) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width > 1 && r.height > 1 && r.width * r.height < 0.6 * W * H && seen(el) >= 0.05) boxes.push(r);
+    }
+    return boxes;
+  }
+  // What a canvas shows inside a rect, read through a small copy (drawImage never touches the film's own context):
+  // busy = something drawn there (text, a line, a logo), colour = its mean when it is opaque. A canvas the browser
+  // will not let us read (tainted, a cleared WebGL buffer) reports nothing.
+  function canvasAt(a, w, h) {
+    let busy = false, color = null;
+    for (const cv of document.querySelectorAll('canvas')) {
+      if (!cv.width || !cv.height || seen(cv) < 0.05) continue;
+      const cr = cv.getBoundingClientRect();
+      if (cr.right <= a.left || cr.left >= a.left + w || cr.bottom <= a.top || cr.top >= a.top + h) continue;
+      try {
+        const sx = cv.width / cr.width, sy = cv.height / cr.height, n = 48, m = Math.max(4, Math.round(n * h / w));
+        const tmp = document.createElement('canvas'); tmp.width = n; tmp.height = m;
+        const g = tmp.getContext('2d');
+        g.drawImage(cv, (a.left - cr.left) * sx, (a.top - cr.top) * sy, w * sx, h * sy, 0, 0, n, m);
+        const d = g.getImageData(0, 0, n, m).data;
+        let k = 0, sum = [0, 0, 0], l1 = 0, l2 = 0, cover = 0;
+        for (let i = 0; i < d.length; i += 4) { if (d[i + 3] < 8) continue; k++; const y = 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]; l1 += y; l2 += y * y; sum[0] += d[i]; sum[1] += d[i + 1]; sum[2] += d[i + 2]; if (d[i + 3] > 240) cover++; }
+        if (!k) continue;
+        const sd = Math.sqrt(Math.max(0, l2 / k - (l1 / k) ** 2));
+        if (sd > 14 || (k < n * m * 0.9 && k > n * m * 0.02)) busy = true; // edges, or shapes on a clear canvas
+        if (cover > n * m * 0.9) color = sum.map((x) => x / k);
+      } catch (e) { /* unreadable */ }
+    }
+    return { busy, color };
+  }
+  // The colour behind a point. CSS colours and opaque gradients count; a translucent gradient (grain, vignette) is skipped;
+  // under a picture (image, canvas, video) we take the colour the film declares beneath it and say we are not sure.
+  const stops = (img) => (img.match(/rgba?\([^)]*\)/g) || []).map(rgba);
+  function backdrop(x, y) {
+    let sure = true;
+    for (const el of document.elementsFromPoint(x, y)) {
+      if (sig.contains(el)) continue;
+      const o = seen(el);
+      if (o < 0.5) continue;
+      if (el.tagName === 'CANVAS') { const k = canvasAt({ left: x - 2, top: y - 2 }, 4, 4).color; if (k) return { c: k, sure }; sure = false; continue; }
+      if (/^(img|video|svg|iframe|picture)$/.test(el.tagName.toLowerCase())) { sure = false; continue; }
+      const s = getComputedStyle(el);
+      const c = rgba(s.backgroundColor);
+      if (c && c[3] >= 0.9) return { c, sure };
+      if (s.backgroundImage && s.backgroundImage !== 'none') {
+        if (/url\(/.test(s.backgroundImage)) { sure = false; continue; }
+        const st = stops(s.backgroundImage);
+        if (st.length && o >= 0.9 && st.every((x) => x[3] >= 0.9)) return { c: [0, 1, 2].map((i) => st.reduce((a, x) => a + x[i], 0) / st.length), sure };
+      }
+    }
+    return { c: [255, 255, 255], sure };
+  }
+  function updateSignature(t) {
+    const set = signatureSetting();
+    const show = set.on && t >= set.from - 1e-6;
+    if (!show) { if (sig && sig.style.display !== 'none') sig.style.display = 'none'; sigCorner = null; return; }
+    const r = root(), W = window.innerWidth, H = window.innerHeight, u = Math.min(W, H);
+    if (!sig) {
+      sig = document.createElement('div');
+      sig.id = 'om-signature';
+      sig.setAttribute('aria-hidden', 'true');
+      sig.innerHTML = 'Made with <b>huashu-motion</b>';
+      document.body.appendChild(sig);
+    }
+    const rs = getComputedStyle(r);
+    Object.assign(sig.style, { display: 'block', position: 'fixed', zIndex: '2147483647', pointerEvents: 'none', whiteSpace: 'nowrap', margin: '0', padding: '0', fontFamily: rs.fontFamily, fontSize: Math.max(10, Math.round(u * 0.02)) + 'px', fontWeight: '400', lineHeight: '1', letterSpacing: '0.02em', fontStyle: 'normal', textTransform: 'none', top: 'auto', right: 'auto', bottom: 'auto', left: 'auto', opacity: '0', transform: 'none' });
+    sig.firstElementChild.style.fontWeight = '700';
+    // measure in place, then choose the corner (pointer-events forced on so layers that ignore the mouse still count as backdrop)
+    const pad = Math.round(u * 0.035), w = sig.offsetWidth, h = sig.offsetHeight;
+    const rect = (c) => ({ left: c.endsWith('left') ? pad : W - pad - w, top: c.startsWith('top') ? pad : H - pad - h });
+    const hits = (c, boxes) => { const a = rect(c), m = u * 0.01; return boxes.some((b) => b.left < a.left + w + m && b.right > a.left - m && b.top < a.top + h + m && b.bottom > a.top - m) || canvasAt({ left: a.left - m, top: a.top - m }, w + 2 * m, h + 2 * m).busy; };
+    const force = document.createElement('style'); force.textContent = '*{pointer-events:auto!important}#om-signature{pointer-events:none!important}';
+    document.head.appendChild(force);
+    let corner = set.corner, clear = true;
+    if (corner === 'auto') { const boxes = contentBoxes(W, H); corner = CORNERS.find((c) => !hits(c, boxes)) || CORNERS[0]; clear = !hits(corner, boxes); }
+    const at = rect(corner);
+    const { c: bg, sure } = backdrop(at.left + w / 2, at.top + h / 2);
+    force.remove();
+    const own = rgba(rs.color);
+    const fg = own && contrast(own, bg) >= 3 ? own : contrast([245, 245, 245], bg) >= contrast([20, 20, 20], bg) ? [245, 245, 245] : [20, 20, 20];
+    sig.style.color = `rgb(${fg[0]}, ${fg[1]}, ${fg[2]})`;
+    // over a picture the colour is a guess: a soft halo of the opposite tone keeps it legible
+    sig.style.textShadow = sure ? 'none' : lum(fg) > 0.4 ? '0 0 0.5em rgba(0, 0, 0, 0.45)' : '0 0 0.5em rgba(255, 255, 255, 0.5)';
+    const p = Math.min(1, Math.max(0, (t - set.from) / SIG_FADE)), e = p * p * (3 - 2 * p);
+    Object.assign(sig.style, { left: at.left + 'px', top: at.top + 'px', opacity: String(SIG_ALPHA * e), transform: `translateY(${((1 - e) * h * 0.4).toFixed(2)}px)` });
+    sigCorner = { corner, clear };
+  }
+  function signatureInfo() { const s = signatureSetting(); return { ...s, shown: sigCorner }; }
+
   // ---------- settle ----------
   async function settled() {
     const start = performance.now();
@@ -201,6 +327,7 @@
     }
     for (const el of videos()) await syncVideo(el, t);
     for (const el of document.querySelectorAll('audio')) { el.muted = true; try { el.pause(); } catch (e) { /* ignore */ } }
+    updateSignature(t);
     await settled();
     await raf2();
   }
@@ -231,6 +358,7 @@
         if (Math.abs(el.currentTime - m) > 0.004) el.currentTime = m;
       }
     }
+    updateSignature(t);
   }
 
   // Move the timelines through a list of times without painting or waiting: a worker that skipped frames catches up on
@@ -240,7 +368,7 @@
   }
 
   window.__omEngine = {
-    duration, seek, advance, settled, media, variables, preview,
+    duration, seek, advance, settled, media, variables, preview, signature: signatureInfo,
     setMuted(m) { state.muted = !!m; for (const el of document.querySelectorAll('video,audio')) el.muted = state.muted || el.hasAttribute('muted'); },
     setMode(m) { state.mode = m === 'seek' ? 'seek' : 'extract'; },
     setFrames(id, table) { state.frames.set(id, table); },
