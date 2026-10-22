@@ -66,3 +66,17 @@ test('om qa loop check: a cycle matches, a one-way move does not', { skip: !has 
   assert.equal(qa(join(dir, 'loop.mp4'), { loop: true }).loop.seamless, true);
   assert.equal(qa(join(dir, 'oneway.mp4'), { loop: true }).loop.seamless, false);
 });
+
+test('om qa: a film that stands still at the start and never cuts is flagged; a moving one is not', { skip: spawnSync('ffmpeg', ['-version']).status !== 0 && 'no ffmpeg' }, async () => {
+  const { qa: runQa } = await import('../cli/lib/qa.js');
+  const dir = mkdtempSync(join(tmpdir(), 'om-qa-flat-'));
+  // a small square drifting slowly over black for 8 s: the "glow on an empty frame" opening
+  const slow = join(dir, 'slow.mp4'), busy = join(dir, 'busy.mp4');
+  spawnSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', 'color=black:s=320x180:d=8:r=30', '-vf', "drawbox=x='t*2':y=80:w=12:h=12:color=white:t=fill", '-pix_fmt', 'yuv420p', slow]);
+  spawnSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', 'testsrc2=size=320x180:rate=30:duration=8', '-pix_fmt', 'yuv420p', busy]);
+  const a = runQa(slow), b = runQa(busy);
+  assert.equal(a.opening.flat, true);
+  assert.equal(a.flatFilm, true);
+  assert.equal(b.opening.flat, false);
+  assert.equal(b.flatFilm, false);
+});

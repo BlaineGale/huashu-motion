@@ -42,7 +42,8 @@ screenshots, logo, brand colours, existing launch posts, the data file. Note in 
 examples; read it now.
 
 Ask only what you cannot find or infer, in one message, with your defaults written in: "I'll assume
-X unless you say otherwise." Always settle narration once (none / system voice / their recording).
+X unless you say otherwise." When the request is one line, offer the few decisions that change the film
+most with a default and two alternatives named by real references (SKILL.md, step 1). Always settle narration once (none / system voice / their recording).
 
 ## 2. Find the shape of the message
 
@@ -185,7 +186,8 @@ launches, 54 from the top of a prompt gallery. They describe what worked, not wh
 the account. Defaults, not laws: break one when the direction calls for it and say why.
 
 1. **Start moving.** Frame 1 already has motion or an unresolved shape. The hook can be the result
-   first, a prompt being typed, or a question on screen; it is never a static title card. (Films
+   first, a prompt being typed, or a question on screen; it is never a static title card, and never a lone object fading or glowing in on an empty dark
+   frame (the usual opening of a one-line film; it reads as a screensaver). (Films
    built around a person open on the person.)
 2. **Choose the route on purpose.** Continuous — one world, few cuts, an object carried from scene
    to scene (morph, flood, push-through, shared element) — was the median of the short UI films on X

@@ -59,10 +59,18 @@ export function qa(file, { loop = false } = {}) {
   const mean = perSec.reduce((a, b) => a + b, 0) / (perSec.length || 1);
   const sd = Math.sqrt(perSec.reduce((a, b) => a + (b - mean) ** 2, 0) / (perSec.length || 1));
   const loopGap = +diff(f[0], f[f.length - 1]).toFixed(2);
+  // The opening and the whole: what separates a film people watch from a slide deck that happens to move. Measured on
+  // 15 films the user signed off (2026-10) against a one-line film by a new user: their strongest second in the first
+  // 5 s was 2.0–24 (median ~6) with no still stretch over 1.1 s there, and the whole film averaged 0.85–5.8; the
+  // one-line film peaked at 0.9 in its first 5 s, stood still from 0.95 to 4.2 s and averaged 0.18 with no cut.
+  const head = perSec.slice(0, 5), stillHead = dead.filter((x) => x.from < 5 && x.seconds >= 1.5);
+  const opening = { peak: head.length ? Math.max(...head) : 0, still: stillHead, flat: info.duration >= 6 && ((head.length ? Math.max(...head) : 0) < 1.5 || stillHead.length > 0) };
+  const flatFilm = info.duration >= 6 && mean < 0.6 && cuts.length / info.duration * 60 < 3;
   return {
     file, ...info, frames: f.length,
     pops, cuts, dead,
     motion: { perSecond: perSec, mean: +mean.toFixed(2), contrast: +(sd / (mean + 1e-6)).toFixed(2) },
+    opening, flatFilm,
     loop: { firstLastDiff: loopGap, seamless: loopGap < 1.5, checked: loop },
   };
 }
@@ -73,6 +81,8 @@ export function report(r) {
   lines.push(r.dead.length ? `${r.dead.some((x) => x.seconds > 2) ? '✗' : '·'} still for ≥1 s: ${r.dead.map((x) => `${x.from}–${x.to}s`).join(', ')} — fine for a reading hold or an end card, dead time anywhere else` : '✓ no stretch of ≥1 s without motion');
   lines.push(`· ${r.cuts.length} hard cut(s)${r.cuts.length ? ': ' + r.cuts.slice(0, 20).join(', ') + 's' : ''}  (average shot ${(r.duration / (r.cuts.length + 1)).toFixed(1)} s)`);
   lines.push(`· motion per second: ${r.motion.perSecond.join(' ')}  (contrast ${r.motion.contrast}${r.motion.contrast < 0.35 ? ' — very even: the film may feel flat; give it fast and slow moments' : ''})`);
+  if (r.opening && r.opening.flat) lines.push(`✗ flat opening: the strongest second of the first 5 s moves ${r.opening.peak}${r.opening.still.length ? `, still ${r.opening.still.map((x) => `${x.from}–${x.to}s`).join(', ')}` : ''} — films people kept peaked at 2–24 (median ~6) there with no still stretch over 1 s. Open on a big move (a push, a whip, a flood, the result slammed in) and land the first burst before 5 s, unless the brief asked for calm`);
+  if (r.flatFilm) lines.push(`✗ the whole film barely moves (mean ${r.motion.mean}, ${r.cuts.length} cuts) — it reads as slides. Films people kept averaged 0.85–5.8: cut, change shot scale, bring in a montage burst (rhythm.md)`);
   if (r.loop.checked) lines.push(r.loop.seamless ? `✓ last frame matches the first (diff ${r.loop.firstLastDiff}) — loops cleanly` : `✗ last frame differs from the first (diff ${r.loop.firstLastDiff}) — it will stutter as a loop`);
   return lines.join('\n');
 }
