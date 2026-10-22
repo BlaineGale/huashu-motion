@@ -79,4 +79,13 @@ test('om qa: a film that stands still at the start and never cuts is flagged; a 
   assert.equal(a.flatFilm, true);
   assert.equal(b.opening.flat, false);
   assert.equal(b.flatFilm, false);
+  // frame 0 is the poster: the lone mark on black is an empty one, the busy film is not
+  assert.equal(a.firstFrame.empty, true);
+  assert.equal(b.firstFrame.empty, false);
+  // a film that fades up from black: empty at 0, and qa says when the frame fills
+  const fade = join(dir, 'fade.mp4');
+  spawnSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', 'testsrc2=size=320x180:rate=30:duration=4', '-vf', 'fade=in:st=0:d=1.5', '-pix_fmt', 'yuv420p', fade]);
+  const c = runQa(fade);
+  assert.equal(c.firstFrame.empty, true);
+  assert.ok(c.firstFrame.contentAt > 0.2 && c.firstFrame.contentAt < 1.6, JSON.stringify(c.firstFrame));
 });

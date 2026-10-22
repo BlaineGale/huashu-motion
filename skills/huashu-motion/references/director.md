@@ -107,6 +107,12 @@ films were material: a pure code recording versus live footage with UI cards gro
 - **A · Fit** — the language the message shape and personality point to. The safe, excellent choice.
 - **B · Amplify** — the same message pushed: a bolder language or a stronger device (one continuous
   take instead of scenes, type as the hero instead of UI, a 3D world instead of flat).
+- **Depth, and only once:** exactly one of the three is a depth direction (it can be A, B or C,
+  whichever the product suits) and the other two use languages with no 3D as their idea, so the
+  user always has depth to choose and always has something else. Which you recommend follows the
+  product and the brief: depth for a premium launch, a physical or iconic object, an interface
+  with layers worth separating; another language when the message is a sentence, a list, a
+  changelog, a mechanism, or the user's words point elsewhere.
 - **C · Unexpected** — a different language that still carries the message and suits the brand
   (an art-history reimagining, a character story, an editorial collage). It must still be about
   the product; novelty for its own sake is not a direction. Patterns that worked in Oct 2026: the
@@ -187,7 +193,7 @@ From 142 high-engagement films of Sep–Oct 2026: 40 from the Claude Motion wave
 launches, 54 from the top of a prompt gallery. They describe what worked, not why; likes depend on
 the account. Defaults, not laws: break one when the direction calls for it and say why.
 
-1. **Start moving.** Frame 1 already has motion or an unresolved shape. The hook can be the result
+1. **Start moving.** Frame 0 is the poster feeds and players show before the film plays: the subject is already in it. From there it already has motion or an unresolved shape. The hook can be the result
    first, a prompt being typed, or a question on screen; it is never a static title card, and never a lone object fading or glowing in on an empty dark
    frame (the usual opening of a one-line film; it reads as a screensaver). (Films
    built around a person open on the person.)
@@ -210,10 +216,10 @@ the account. Defaults, not laws: break one when the direction calls for it and s
    placeholder where a photo, avatar or thumbnail belongs: use the product's own, a real one found
    online, or an openly licensed one, with its source in materials.md. Never a screenshot panned around. Prompts and code
    shown on screen count as real material.
-   **In depth when it can be.** The same real material reads as made, not slid, when the camera
-   moves round it: the interface as layers in space that separate and settle, the logo and the
-   screens as objects in a lit studio, something near, the subject, something behind. A film that is
-   flat from start to end needs a reason (a changelog, a typographic ident). [depth.md](depth.md)
+   **Depth is a choice the user makes.** One of the three directions is in depth (the interface
+   as layers in space, the logo and screens as objects in a studio), the other two are not; which
+   one wins depends on the product and the brief. When depth is chosen, the camera carries the whole
+   film in space, not just its opening. [depth.md](depth.md)
 5. **Craft shows at rest.** Every hold is a poster: type set properly, one accent, no default fonts.
 6. **Sound.** Long films and films with people are sound-led; short UI films and loops must read
    with the sound off (a silent, self-explaining loop was among the most saved films). Each landing

@@ -3,8 +3,9 @@
 A product film that only slides flat panels around reads as slides, however well it is cut. Depth is what makes
 a shot feel built: the camera swings round the interface, layers of it separate and pass each other, the
 product's logo stands as an object with light on its edges, the frame has a foreground, a subject and a
-background moving at different speeds. Reach for it whenever the material allows; leave it out when the
-message is a sentence to read, or the user asked for flat (a changelog, a typographic ident, a diagram).
+background moving at different speeds. It is one of the three directions the user is offered — always one of
+them, never all three, and recommended only when the product and the brief suit it (a premium launch, an
+object, an interface with layers worth separating). When it is chosen, it carries the whole film (below).
 
 ## Two routes, one camera
 
@@ -39,6 +40,25 @@ Every move has a subject and ends on something. Starting points, not rules:
 - Never spin without a target, never cut straight through an object, never end a move on empty space.
   Frames where a dark side or the back of a slab fills the screen read as a black flash: check the first frame
   and the middle of every swing with `om still`.
+
+## When depth is chosen, the whole film is in space
+
+The test films that took the depth direction opened in 3D, then went back to flat cuts for the middle and
+the end: depth as a trick for the first two seconds. A depth film is one space the camera travels through:
+
+- **Every stretch has a camera move in space.** Lists, proofs and features are stations in the same world
+  (cards standing in depth, panels lifted off the interface, objects on the studio floor), and the camera
+  travels from one to the next — an orbit through a row, a push past a near layer into the next, a crane
+  over all of them. A cut is fine (on the beat), but the shot after it is also in space.
+- **Transitions go through space**: fly through a layer into what is behind it, pull back until the last
+  scene is one card among many, rack focus from near to far, whip-pan along the row. Prefer these to 2D
+  wipes and swaps.
+- **Flat is the exception, used as contrast**: one deliberate flat beat (a slammed word, the pause before
+  the drop) at most, then back into space. The end can land flat (`flat: true`) — a landing, not an escape.
+- **Plan it in the treatment**: the rhythm sheet names the camera move of every stretch and where each
+  station sits in the world (x, y, z), so the film is one route, not a deck with a 3D cover.
+- **Check it**: `om still` a frame from every stretch; if a stretch's frame could be a flat slide, give it
+  its move.
 
 ## A fine space
 

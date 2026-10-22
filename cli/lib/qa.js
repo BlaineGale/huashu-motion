@@ -66,11 +66,30 @@ export function qa(file, { loop = false } = {}) {
   const head = perSec.slice(0, 5), stillHead = dead.filter((x) => x.from < 5 && x.seconds >= 1.5);
   const opening = { peak: head.length ? Math.max(...head) : 0, still: stillHead, flat: info.duration >= 6 && ((head.length ? Math.max(...head) : 0) < 1.5 || stillHead.length > 0) };
   const flatFilm = info.duration >= 6 && mean < 0.6 && cuts.length / info.duration * 60 < 3;
+  // Frame 0 is the poster: feeds and players show it before the film plays, a README GIF shows it while it loads, a
+  // share preview often is it. "Content" = pixels away from the frame's median grey and edges between neighbours.
+  // Measured 2026-10-22: films that open on their subject had 7–94 % such pixels and 2–18 % edges in frame 0; a blank
+  // page, black, or a lone small mark on black had under 2.5 % and 1.2 % (three of the user's approved films opened
+  // that way, fading up over ~2 s — fine to watch, an empty poster).
+  const content = (px) => {
+    const m = median(px);
+    let far = 0, edges = 0;
+    for (let i = 0; i < px.length; i++) {
+      if (Math.abs(px[i] - m) > 16) far++;
+      if (i % W < W - 1 && Math.abs(px[i] - px[i + 1]) > 20) edges++;
+    }
+    return { far: far / px.length, edges: edges / (H * (W - 1)) };
+  };
+  const filled = (c) => c.far >= 0.05 && c.edges >= 0.015;
+  const c0 = f.length ? content(f[0]) : { far: 0, edges: 0 };
+  let arrives = null;
+  for (let i = 0; i < f.length && i < fps * 10; i++) if (filled(content(f[i]))) { arrives = t(i); break; }
+  const firstFrame = { far: +c0.far.toFixed(3), edges: +c0.edges.toFixed(3), empty: c0.far < 0.03 && c0.edges < 0.012, contentAt: arrives };
   return {
     file, ...info, frames: f.length,
     pops, cuts, dead,
     motion: { perSecond: perSec, mean: +mean.toFixed(2), contrast: +(sd / (mean + 1e-6)).toFixed(2) },
-    opening, flatFilm,
+    opening, flatFilm, firstFrame,
     loop: { firstLastDiff: loopGap, seamless: loopGap < 1.5, checked: loop },
   };
 }
@@ -81,6 +100,7 @@ export function report(r) {
   lines.push(r.dead.length ? `${r.dead.some((x) => x.seconds > 2) ? '✗' : '·'} still for ≥1 s: ${r.dead.map((x) => `${x.from}–${x.to}s`).join(', ')} — fine for a reading hold or an end card, dead time anywhere else` : '✓ no stretch of ≥1 s without motion');
   lines.push(`· ${r.cuts.length} hard cut(s)${r.cuts.length ? ': ' + r.cuts.slice(0, 20).join(', ') + 's' : ''}  (average shot ${(r.duration / (r.cuts.length + 1)).toFixed(1)} s)`);
   lines.push(`· motion per second: ${r.motion.perSecond.join(' ')}  (contrast ${r.motion.contrast}${r.motion.contrast < 0.35 ? ' — very even: the film may feel flat; give it fast and slow moments' : ''})`);
+  if (r.firstFrame && r.firstFrame.empty) lines.push(`✗ frame 0 is nearly empty — it is the poster feeds, players and README GIFs show before the film plays${r.firstFrame.contentAt != null ? `; the frame fills at ${r.firstFrame.contentAt}s` : ''}. Open on the subject already in frame (in motion), not on a blank, a black or a lone small mark the film builds from`);
   if (r.opening && r.opening.flat) lines.push(`✗ flat opening: the strongest second of the first 5 s moves ${r.opening.peak}${r.opening.still.length ? `, still ${r.opening.still.map((x) => `${x.from}–${x.to}s`).join(', ')}` : ''} — films people kept peaked at 2–24 (median ~6) there with no still stretch over 1 s. Open on a big move (a push, a whip, a flood, the result slammed in) and land the first burst before 5 s, unless the brief asked for calm`);
   if (r.flatFilm) lines.push(`✗ the whole film barely moves (mean ${r.motion.mean}, ${r.cuts.length} cuts) — it reads as slides. Films people kept averaged 0.85–5.8: cut, change shot scale, bring in a montage burst (rhythm.md)`);
   if (r.loop.checked) lines.push(r.loop.seamless ? `✓ last frame matches the first (diff ${r.loop.firstLastDiff}) — loops cleanly` : `✗ last frame differs from the first (diff ${r.loop.firstLastDiff}) — it will stutter as a loop`);
