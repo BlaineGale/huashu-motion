@@ -5,7 +5,7 @@
 //
 // Fitting: every !mark:name! in the score lands on the timeline label `scene:name` (or `name`), or on a time
 // given in OM.music({ marks: { name: seconds } }). Instruments: any voice of score.js by name (inst=piano,
-// strings, horn, pizz, harp, marimba, synbass, supersaw…), and inst=drums with kit=pop|acoustic|808|cinematic.
+// strings, horn, pizz, harp, marimba, synbass, supersaw…), and inst=drums with kit=pop|acoustic|808|cinematic|lofi|gated|chip|folk.
 import { parseAbc, perform, renderPerformance } from './composer.js';
 import { N, RATE, biquad, rng } from './dsp.js';
 import { plate } from './fx.js';

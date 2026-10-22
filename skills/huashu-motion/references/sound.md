@@ -4,6 +4,8 @@ A film ships with music and sound effects. Silent motion reads as a draft: the s
 
 `om sound` renders everything from what the composition declares — no network, no API — so a retimed film re-renders its own soundtrack (`om render` does it before every export). Instruments are synthesized, or played from real recordings once the sample pack is installed (`om samples build`, once per machine: a concert grand, string sections, horns, harp, mallets, guitars, a recorded drum kit; CC0 and CC-BY, credits in its NOTICE.txt). Run `om samples` to see whether it is there; without it everything still works, on synths.
 
+**Pick the world first** ([music.md](music.md)): sixteen musical worlds — pulse minimalism, UK garage, minimal techno, drum and bass, funk, lo-fi, trap, synthwave, cinematic, lyrical piano, jazz trio, folk, chiptune, ambient, 国风, amapiano — each with the products it suits and a two-bar groove that renders. The direction card already named one. `om sound` prints the score's soundprint (tempo, key, band) and warns when it is one of the example scores' bands or a recent film's on this machine: every film sounding alike is the failure users notice first.
+
 There are two ways to score a film:
 
 - **A built-in direction** — `OM.music({ product: 'devtool' })` picks one of three directions for the product category and composes it around your scenes, drop and ending. Fast and decent: drafts, quick stings, anything where music is not the point.
@@ -60,11 +62,11 @@ Voice attributes: `inst=` the instrument, `role=melody` (brought forward, a hair
 
 Instruments: `piano` (a concert grand, stereo, with pedal and key-release noise), `strings` (each note played by the section that owns its register), the sections `violins violas celli basses`, a solo `violin`, tremolo `trem`, `lowstr`, `pizz stacc harp horn brass flute dizi erhu guzheng guitar uke rhodes epiano vibes marimba kalimba glock bell glass`, synths `pad warmpad supersaw saw sqlead synpluck pluck chip tri clav`, basses `bass synbass sub808 sinebass`.
 
-Drums: `inst=drums kit=pop|acoustic|808|cinematic`, notes on the General MIDI map — `C,,` kick, `^C,,` rim, `D,,` snare, `^D,,` clap, `^F,,` closed hat, `^A,,` open hat, `A,,` tom, `^C,` crash, `^F,` tambourine, `^A` shaker. The pop and acoustic kits are a recorded kit; 808 and cinematic are synthesized (taiko, big snare). Two drum voices with different kits are fine (an 808 kick under a recorded snare and hats).
+Drums: `inst=drums kit=pop|acoustic|808|cinematic|lofi|gated|chip|folk`, notes on the General MIDI map — `C,,` kick, `^C,,` rim, `D,,` snare, `^D,,` clap, `^F,,` closed hat, `^A,,` open hat, `A,,` tom, `^C,` crash, `^F,` tambourine, `^A` shaker. The pop and acoustic kits are a recorded kit; 808 and cinematic are synthesized (taiko, big snare); lofi is a dusty boom-bap kit, gated the 80s gated snare, chip the 8-bit kit, folk body percussion (stomp, snaps, frame drum). Two drum voices with different kits are fine (an 808 kick under a recorded snare and hats).
 
 ### 3. Compose for the picture
 
-The cases in [scores/](scores/) are complete, annotated scores — read the one closest to your film before writing:
+The cases in [scores/](scores/) are complete, annotated scores. Read one for **structure and technique** — how a hook, a stop, a drop and a button are written — never for its sound: take the band, tempo and key from your film's world in [music.md](music.md). (Ten films in a row once copied Signal's header and all sounded the same; `om sound` now says so.)
 
 - [first-light.abc](scores/first-light.abc) — **piano to full band**: a motif alone, a pulse and a swell, a stop on the dominant, the reveal a whole step up with everything, the motif as the sonic logo. Human, premium, emotional launches.
 - [four-rooms.abc](scores/four-rooms.abc) — **a score fitted to an existing film**: seven scenes, four sync points, a bar cut to 3/4 instead of bending the tempo. How to score a film that is already cut.

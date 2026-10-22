@@ -4,6 +4,7 @@
 // no samples, no network, no dependencies — and the same source always gives the same file.
 // The music itself is composed in score.js (styles, products, drop, ending, motif); this file renders
 // the effects in the style's kit, automates and mixes the buses and writes the master.
+import { soundprintReport } from './soundprint.js';
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -533,6 +534,7 @@ export async function sound(project, opts = {}, log = () => {}) {
       : `music    ${trackInfo || describe(p)} · ${p.sections.length} section${p.sections.length > 1 ? 's' : ''} (${p.sections.map((s) => `${s.id}${s.drop ? '◆' : ''}:${s.energy.toFixed(1)}`).join(' ')})`,
   ];
   if (composed) {
+    try { lines.push(...soundprintReport(project.root, readScore(html)).lines); } catch { /* a score the print cannot read still plays */ }
     lines.push(`fit      ${composed.marks.length ? `marks on the picture: ${composed.marks.join(' · ')}` : 'no !mark:name! matched a scene label — the score plays from the start at its written tempo'}${composed.unmatched.length ? ` · unmatched: ${composed.unmatched.join(', ')}` : ''}`);
     if (composed.stretches.length) lines.push(`tempo    ${composed.stretches.map((x) => `${x.from}→${x.to} ${x.qpm.toFixed(1)} bpm (${x.bend >= 0 ? '+' : ''}${(x.bend * 100).toFixed(1)}%)`).join(' · ')}${composed.stretches.some((x) => Math.abs(x.bend) > 0.08) ? ' — a stretch bent more than 8 %: add or remove bars there instead' : ''}`);
     if (composed.end > p.duration + 0.3) lines.push(`warning  the score runs to ${composed.end.toFixed(2)}s, past the film's end (${p.duration.toFixed(2)}s); it is faded out`);

@@ -11,7 +11,7 @@
 // !crescendo(! !crescendo)! !diminuendo(! !diminuendo)! !fermata! !accent! (or >), !ped! !ped-up!,
 // and two extensions: !rit(! … !rit)! (slow down by ~30 % across the span) and !breath!.
 //
-// For launch films: a voice with inst=drums (kit=pop|acoustic|808|cinematic) reads its notes on the General
+// For launch films: a voice with inst=drums (kit=pop|acoustic|808|cinematic|lofi|gated|chip|folk) reads its notes on the General
 // MIDI drum map — C,, kick, ^C,, rim, D,, snare, ^D,, clap, ^F,, hat, ^A,, open hat, A,, tom, ^C, crash,
 // ^F, tambourine, ^A shaker. Cue marks become sound design on the beat: !hit! (impact on the reveal),
 // !rise(! … !rise)! (a riser that lands where it closes), !mark:name! (a named moment, for lining the score
@@ -319,6 +319,12 @@ export const DRUM_KITS = {
   acoustic: { kick: 'kicksoft', snare: 'snare', hat: 'hat', ohat: 'ohat', tamb: 'shaker' },
   808: { kick: 'kick808', snare: 'clap', hat: 'hat808', tamb: 'shaker' },
   cinematic: { kick: 'taiko', snare: 'snarebig', hat: 'shaker', ohat: 'crash', tom: 'taiko' },
+  // the rest of score.js's drum voices, reachable from a score: a dusty boom-bap kit, the gated 80s snare,
+  // the 8-bit kit, and body percussion (stomp, snaps, frame drum) for folk and acoustic songs
+  lofi: { kick: 'kicksoft', snare: 'snarelofi', clap: 'snap', hat: 'hat', ohat: 'ohat', tamb: 'shaker' },
+  gated: { kick: 'kick', snare: 'snaregated', clap: 'snaregated', hat: 'hat', ohat: 'ohat', tamb: 'shaker' },
+  chip: { kick: 'kickchip', snare: 'snarechip', clap: 'snarechip', hat: 'hatchip', ohat: 'hatchip', tamb: 'hatchip' },
+  folk: { kick: 'stomp', snare: 'snap', clap: 'clap', hat: 'shaker', ohat: 'shaker', tom: 'frame', rim: 'woodblock', tamb: 'shaker' },
 };
 // A bowed or blown note is shaped by the player, not the sample: the bow or breath eases in (slower when
 // soft), a long note swells and relaxes (messa di voce), and its tail eases out instead of stopping.
